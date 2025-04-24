@@ -110,8 +110,12 @@ export default function Home() {
                                     </thead>
                                     <tbody>
                                         {analysisResult.analysis
-                                            .split("\n\n")
+                                            .split("#### ")
+                                            .slice(1)
                                             .map((section, index) => {
+                                                if (!section.trim())
+                                                    return null;
+
                                                 const lines = section
                                                     .split("\n")
                                                     .filter(
@@ -123,23 +127,27 @@ export default function Home() {
                                                             ) &&
                                                             !line.includes(
                                                                 "Goals"
-                                                            ) &&
-                                                            !line.includes(
-                                                                "### Categories and Levels of Completion"
                                                             )
-                                                    ); // Remove empty lines and exclude 'Current Status', 'Goals', and the header
+                                                    );
                                                 if (lines.length < 6)
-                                                    return null; // Skip invalid sections
+                                                    return null;
 
                                                 const categoryMatch =
-                                                    section.match(
-                                                        /^####\s*\d+\.\s*(.*)/
-                                                    ); // Match the category name preceded by '####' and a number
+                                                    lines[0].match(
+                                                        /^\d+\.\s*(.*)/
+                                                    );
                                                 const category = categoryMatch
                                                     ? categoryMatch[1].trim()
-                                                    : "Unknown Category"; // Extract category name or fallback
+                                                    : "Unknown Category";
+
                                                 const levels = lines
-                                                    .slice(1)
+                                                    .filter(
+                                                        (line) =>
+                                                            line.includes(
+                                                                "**"
+                                                            ) &&
+                                                            line.includes(":")
+                                                    )
                                                     .map((line) => {
                                                         const match =
                                                             line.match(
@@ -166,8 +174,7 @@ export default function Home() {
                                                     >
                                                         <td className="border border-gray-300 px-6 py-4 font-bold text-center align-top">
                                                             {category}
-                                                        </td>{" "}
-                                                        {/* Correctly display category name */}
+                                                        </td>
                                                         {levels.map(
                                                             (
                                                                 level,
