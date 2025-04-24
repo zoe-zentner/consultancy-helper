@@ -85,9 +85,12 @@ export default function Home() {
                             Analysis Result
                         </h2>
                         <div className="space-y-4">
-                            <pre className="text-gray-700 whitespace-pre-line">
-                                {analysisResult.analysis}
-                            </pre>
+                            <p className="text-gray-700 whitespace-pre-line">
+                                {analysisResult.analysis
+                                    .split("\n\n")
+                                    .filter((paragraph, index, array) => index !== 0 && index !== array.length - 1)
+                                    .join("\n\n")}
+                            </p>
                         </div>
                     </div>
                 )}
