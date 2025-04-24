@@ -56,7 +56,7 @@ export default function Home() {
                 </p>
             </header>
 
-            <main className="bg-white shadow-md rounded-lg p-6 w-full max-w-lg">
+            <main className="bg-white shadow-md rounded-lg p-8 w-full max-w-5xl"> {/* Increased max width */}
                 <div className="mb-4">
                     <input
                         type="file"
@@ -84,132 +84,85 @@ export default function Home() {
                         <h2 className="text-xl font-semibold text-gray-800 mb-4">
                             Analysis Result
                         </h2>
-                        <div className="space-y-4">
-                            <p className="text-gray-700 whitespace-pre-line">
-                                <table className="min-w-full divide-y divide-gray-200">
-                                    <thead>
-                                        <tr>
-                                            <th className="border border-gray-300 px-6 py-4 text-center"></th>{" "}
-                                            {/* Blank header for the first column */}
-                                            <th className="border border-gray-300 px-6 py-4 text-center">
-                                                Initial
-                                            </th>
-                                            <th className="border border-gray-300 px-6 py-4 text-center">
-                                                Repeatable
-                                            </th>
-                                            <th className="border border-gray-300 px-6 py-4 text-center">
-                                                Defined
-                                            </th>
-                                            <th className="border border-gray-300 px-6 py-4 text-center">
-                                                Managed
-                                            </th>
-                                            <th className="border border-gray-300 px-6 py-4 text-center">
-                                                Optimizing
-                                            </th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {analysisResult.analysis
-                                            .split("#### ")
-                                            .slice(1)
-                                            .map((section, index) => {
-                                                if (!section.trim())
-                                                    return null;
+                        <div className="overflow-x-auto flex justify-center">
+                            <table className="min-w-full divide-y divide-gray-200 border border-gray-300">
+                                <thead>
+                                    <tr>
+                                        <th className="border border-gray-300 px-6 py-4 text-center"></th>
+                                        <th className="border border-gray-300 px-6 py-4 text-center">Initial</th>
+                                        <th className="border border-gray-300 px-6 py-4 text-center">Repeatable</th>
+                                        <th className="border border-gray-300 px-6 py-4 text-center">Defined</th>
+                                        <th className="border border-gray-300 px-6 py-4 text-center">Managed</th>
+                                        <th className="border border-gray-300 px-6 py-4 text-center">Optimizing</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {analysisResult.analysis
+                                        .split("#### ")
+                                        .slice(1)
+                                        .map((section, index) => {
+                                            if (!section.trim()) return null;
 
-                                                const lines = section
-                                                    .split("\n")
-                                                    .filter(
-                                                        (line) =>
-                                                            line.trim() !==
-                                                                "" &&
-                                                            !line.includes(
-                                                                "Current Status"
-                                                            ) &&
-                                                            !line.includes(
-                                                                "Goals"
-                                                            )
-                                                    );
-                                                if (lines.length < 6)
-                                                    return null;
-
-                                                const categoryMatch =
-                                                    lines[0].match(
-                                                        /^\d+\.\s*(.*)/
-                                                    );
-                                                const category = categoryMatch
-                                                    ? categoryMatch[1].trim()
-                                                    : "Unknown Category";
-
-                                                const levels = lines
-                                                    .filter(
-                                                        (line) =>
-                                                            line.includes(
-                                                                "**"
-                                                            ) &&
-                                                            line.includes(":")
-                                                    )
-                                                    .map((line) => {
-                                                        const match =
-                                                            line.match(
-                                                                /-\s*\*\*(.*?)\*\*:\s*(.*)/
-                                                            );
-                                                        return match
-                                                            ? {
-                                                                  level: match[1].trim(),
-                                                                  description:
-                                                                      match[2].trim(),
-                                                              }
-                                                            : null;
-                                                    })
-                                                    .filter(Boolean);
-
-                                                return (
-                                                    <tr
-                                                        key={index}
-                                                        className={
-                                                            index % 2 === 0
-                                                                ? "bg-white"
-                                                                : "bg-gray-50"
-                                                        }
-                                                    >
-                                                        <td className="border border-gray-300 px-6 py-4 font-bold text-center align-top">
-                                                            {category}
-                                                        </td>
-                                                        {levels.map(
-                                                            (
-                                                                level,
-                                                                levelIndex
-                                                            ) => (
-                                                                <td
-                                                                    key={
-                                                                        levelIndex
-                                                                    }
-                                                                    className="border border-gray-300 px-6 py-4 text-justify align-top"
-                                                                >
-                                                                    {
-                                                                        level?.description
-                                                                    }
-                                                                </td>
-                                                            )
-                                                        )}
-                                                    </tr>
+                                            const lines = section
+                                                .split("\n")
+                                                .filter(
+                                                    (line) =>
+                                                        line.trim() !== "" &&
+                                                        !line.includes("Current Status") &&
+                                                        !line.includes("Goals")
                                                 );
-                                            })}
-                                    </tbody>
-                                </table>
-                            </p>
-                        </div>
-                    </div>
-                )}
+                                            if (lines.length < 6) return null;
 
-                {analysisResult && (
-                    <div className="mt-6">
-                        <h2 className="text-xl font-semibold text-gray-800 mb-4">
-                            Raw Response
-                        </h2>
-                        <pre className="bg-gray-100 p-4 rounded-lg text-sm text-gray-700 overflow-auto">
-                            {JSON.stringify(analysisResult.analysis, null, 2)}
-                        </pre>
+                                            const categoryMatch = lines[0].match(/^\d+\.\s*(.*)/);
+                                            const category = categoryMatch
+                                                ? categoryMatch[1].trim()
+                                                : "Unknown Category";
+
+                                            const levels = lines
+                                                .filter(
+                                                    (line) =>
+                                                        line.includes("**") &&
+                                                        line.includes(":")
+                                                )
+                                                .map((line) => {
+                                                    const match = line.match(
+                                                        /-\s*\*\*(.*?)\*\*:\s*(.*)/
+                                                    );
+                                                    return match
+                                                        ? {
+                                                              level: match[1].trim(),
+                                                              description: match[2].trim(),
+                                                          }
+                                                        : null;
+                                                })
+                                                .filter(Boolean);
+
+                                            return (
+                                                <tr
+                                                    key={index}
+                                                    className={
+                                                        index % 2 === 0
+                                                            ? "bg-white"
+                                                            : "bg-gray-50"
+                                                    }
+                                                >
+                                                    <td className="border border-gray-300 px-6 py-4 font-bold text-center align-top">
+                                                        {category}
+                                                    </td>
+                                                    {levels.map((level, levelIndex) => (
+                                                        <td
+                                                            key={levelIndex}
+                                                            className="border border-gray-300 px-6 py-4 text-left align-top"
+                                                        >
+                                                            {level?.description}
+                                                        </td>
+                                                    ))}
+                                                </tr>
+                                            );
+                                        })}
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 )}
             </main>
