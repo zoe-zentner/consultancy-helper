@@ -140,11 +140,7 @@ export default function Home() {
                                             return (
                                                 <tr
                                                     key={index}
-                                                    className={
-                                                        index % 2 === 0
-                                                            ? "bg-white"
-                                                            : "bg-gray-50"
-                                                    }
+                                                    className="bg-white"
                                                 >
                                                     <td className="border border-gray-300 px-6 py-4 font-bold text-center align-top">
                                                         {category}
@@ -166,10 +162,6 @@ export default function Home() {
                     </div>
                 )}
             </main>
-
-            <footer className="mt-8 text-center text-gray-500 text-sm">
-                Built with Next.js, Tailwind CSS, and OpenAI API
-            </footer>
         </div>
     );
 }
