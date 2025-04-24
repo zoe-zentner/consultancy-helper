@@ -56,7 +56,7 @@ export default function Home() {
                 </p>
             </header>
 
-            <main className="bg-white shadow-md rounded-lg p-8 w-full max-w-5xl"> {/* Increased max width */}
+            <main className="bg-white shadow-md rounded-lg p-6 w-full max-w-4xl">
                 <div className="mb-4">
                     <input
                         type="file"
@@ -80,88 +80,99 @@ export default function Home() {
                 </button>
 
                 {analysisResult && (
-                    <div className="mt-6">
+                    <div className="mt-6 overflow-x-auto">
                         <h2 className="text-xl font-semibold text-gray-800 mb-4">
                             Analysis Result
                         </h2>
-                        <div className="overflow-x-auto flex justify-center">
-                            <table className="min-w-full divide-y divide-gray-200 border border-gray-300">
-                                <thead>
-                                    <tr>
-                                        <th className="border border-gray-300 px-6 py-4 text-center"></th>
-                                        <th className="border border-gray-300 px-6 py-4 text-center">Initial</th>
-                                        <th className="border border-gray-300 px-6 py-4 text-center">Repeatable</th>
-                                        <th className="border border-gray-300 px-6 py-4 text-center">Defined</th>
-                                        <th className="border border-gray-300 px-6 py-4 text-center">Managed</th>
-                                        <th className="border border-gray-300 px-6 py-4 text-center">Optimizing</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {analysisResult.analysis
-                                        .split("#### ")
-                                        .slice(1)
-                                        .map((section, index) => {
-                                            if (!section.trim()) return null;
-
-                                            const lines = section
-                                                .split("\n")
-                                                .filter(
-                                                    (line) =>
-                                                        line.trim() !== "" &&
-                                                        !line.includes("Current Status") &&
-                                                        !line.includes("Goals")
-                                                );
-                                            if (lines.length < 6) return null;
-
-                                            const categoryMatch = lines[0].match(/^\d+\.\s*(.*)/);
-                                            const category = categoryMatch
-                                                ? categoryMatch[1].trim()
-                                                : "Unknown Category";
-
-                                            const levels = lines
-                                                .filter(
-                                                    (line) =>
-                                                        line.includes("**") &&
-                                                        line.includes(":")
-                                                )
-                                                .map((line) => {
-                                                    const match = line.match(
-                                                        /-\s*\*\*(.*?)\*\*:\s*(.*)/
+                        <div className="space-y-4">
+                            <div className="whitespace-normal">
+                                <table className="w-full border-collapse border border-gray-300">
+                                    <thead>
+                                        <tr>
+                                            <th className="border border-gray-300 px-4 py-3 text-center bg-gray-50 font-semibold"></th>
+                                            <th className="border border-gray-300 px-4 py-3 text-center bg-gray-50 font-semibold">Initial</th>
+                                            <th className="border border-gray-300 px-4 py-3 text-center bg-gray-50 font-semibold">Repeatable</th>
+                                            <th className="border border-gray-300 px-4 py-3 text-center bg-gray-50 font-semibold">Defined</th>
+                                            <th className="border border-gray-300 px-4 py-3 text-center bg-gray-50 font-semibold">Managed</th>
+                                            <th className="border border-gray-300 px-4 py-3 text-center bg-gray-50 font-semibold">Optimizing</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {analysisResult.analysis
+                                            .split("### ")
+                                            .filter(section => section.match(/^\d+\./))
+                                            .map((section, index) => {
+                                                const lines = section
+                                                    .split("\n")
+                                                    .filter(
+                                                        (line) =>
+                                                            line.trim() !== "" &&
+                                                            !line.includes("Current Status") &&
+                                                            !line.includes("Goals") &&
+                                                            !line.includes("Summary") &&
+                                                            !line.includes("Categories and Levels of Completion")
                                                     );
-                                                    return match
-                                                        ? {
-                                                              level: match[1].trim(),
-                                                              description: match[2].trim(),
-                                                          }
-                                                        : null;
-                                                })
-                                                .filter(Boolean);
 
-                                            return (
-                                                <tr
-                                                    key={index}
-                                                    className="bg-white"
-                                                >
-                                                    <td className="border border-gray-300 px-6 py-4 font-bold text-center align-top">
-                                                        {category}
-                                                    </td>
-                                                    {levels.map((level, levelIndex) => (
-                                                        <td
-                                                            key={levelIndex}
-                                                            className="border border-gray-300 px-6 py-4 text-left align-top"
-                                                        >
-                                                            {level?.description}
+                                                const categoryMatch = lines[0].match(/^\d+\.\s*\*\*(.*?)\*\*/);
+                                                const category = categoryMatch ? categoryMatch[1].trim() : "Unknown Category";
+                                                
+                                                const levels = lines
+                                                    .filter(line => 
+                                                        line.includes("**Initial**") || 
+                                                        line.includes("**Repeatable**") || 
+                                                        line.includes("**Defined**") || 
+                                                        line.includes("**Managed**") || 
+                                                        line.includes("**Optimizing**")
+                                                    )
+                                                    .map((line) => {
+                                                        const match = line.match(/-\s*\*\*(.*?)\*\*:\s*(.*)/);
+                                                        return match
+                                                            ? {
+                                                                  level: match[1].trim(),
+                                                                  description: match[2].trim(),
+                                                              }
+                                                            : null;
+                                                    })
+                                                    .filter(Boolean);
+
+                                                return (
+                                                    <tr key={index}>
+                                                        <td className="border border-gray-300 px-4 py-3 font-semibold text-center whitespace-normal">
+                                                            {category}
                                                         </td>
-                                                    ))}
-                                                </tr>
-                                            );
-                                        })}
-                                </tbody>
-                            </table>
+                                                        {levels.map((level, levelIndex) => (
+                                                            <td
+                                                                key={levelIndex}
+                                                                className="border border-gray-300 px-4 py-3 whitespace-normal"
+                                                            >
+                                                                {level?.description}
+                                                            </td>
+                                                        ))}
+                                                    </tr>
+                                                );
+                                            })}
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
                 )}
+
+                {analysisResult && (
+                    <div className="mt-6">
+                        <h2 className="text-xl font-semibold text-gray-800 mb-4">
+                            Raw Response
+                        </h2>
+                        <pre className="bg-gray-100 p-4 rounded-lg text-sm text-gray-700 overflow-auto">
+                            {JSON.stringify(analysisResult.analysis, null, 2)}
+                        </pre>
+                    </div>
+                )}
             </main>
+
+            <footer className="mt-8 text-center text-gray-500 text-sm">
+                Built with Next.js, Tailwind CSS, and OpenAI API
+            </footer>
         </div>
     );
 }
