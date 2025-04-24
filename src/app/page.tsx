@@ -86,16 +86,123 @@ export default function Home() {
                         </h2>
                         <div className="space-y-4">
                             <p className="text-gray-700 whitespace-pre-line">
-                                {analysisResult.analysis
-                                    .split("\n\n")
-                                    .filter(
-                                        (paragraph, index, array) =>
-                                            index !== 0 &&
-                                            index !== array.length - 1
-                                    )
-                                    .join("\n\n")}
+                                <table className="min-w-full divide-y divide-gray-200">
+                                    <thead>
+                                        <tr>
+                                            <th className="border border-gray-300 px-6 py-4 text-center"></th>{" "}
+                                            {/* Blank header for the first column */}
+                                            <th className="border border-gray-300 px-6 py-4 text-center">
+                                                Initial
+                                            </th>
+                                            <th className="border border-gray-300 px-6 py-4 text-center">
+                                                Repeatable
+                                            </th>
+                                            <th className="border border-gray-300 px-6 py-4 text-center">
+                                                Defined
+                                            </th>
+                                            <th className="border border-gray-300 px-6 py-4 text-center">
+                                                Managed
+                                            </th>
+                                            <th className="border border-gray-300 px-6 py-4 text-center">
+                                                Optimizing
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {analysisResult.analysis
+                                            .split("\n\n")
+                                            .map((section, index) => {
+                                                const lines = section
+                                                    .split("\n")
+                                                    .filter(
+                                                        (line) =>
+                                                            line.trim() !==
+                                                                "" &&
+                                                            !line.includes(
+                                                                "Current Status"
+                                                            ) &&
+                                                            !line.includes(
+                                                                "Goals"
+                                                            ) &&
+                                                            !line.includes(
+                                                                "### Categories and Levels of Completion"
+                                                            )
+                                                    ); // Remove empty lines and exclude 'Current Status', 'Goals', and the header
+                                                if (lines.length < 6)
+                                                    return null; // Skip invalid sections
+
+                                                const categoryMatch =
+                                                    section.match(
+                                                        /^####\s*\d+\.\s*(.*)/
+                                                    ); // Match the category name preceded by '####' and a number
+                                                const category = categoryMatch
+                                                    ? categoryMatch[1].trim()
+                                                    : "Unknown Category"; // Extract category name or fallback
+                                                const levels = lines
+                                                    .slice(1)
+                                                    .map((line) => {
+                                                        const match =
+                                                            line.match(
+                                                                /-\s*\*\*(.*?)\*\*:\s*(.*)/
+                                                            );
+                                                        return match
+                                                            ? {
+                                                                  level: match[1].trim(),
+                                                                  description:
+                                                                      match[2].trim(),
+                                                              }
+                                                            : null;
+                                                    })
+                                                    .filter(Boolean);
+
+                                                return (
+                                                    <tr
+                                                        key={index}
+                                                        className={
+                                                            index % 2 === 0
+                                                                ? "bg-white"
+                                                                : "bg-gray-50"
+                                                        }
+                                                    >
+                                                        <td className="border border-gray-300 px-6 py-4 font-bold text-center align-top">
+                                                            {category}
+                                                        </td>{" "}
+                                                        {/* Correctly display category name */}
+                                                        {levels.map(
+                                                            (
+                                                                level,
+                                                                levelIndex
+                                                            ) => (
+                                                                <td
+                                                                    key={
+                                                                        levelIndex
+                                                                    }
+                                                                    className="border border-gray-300 px-6 py-4 text-justify align-top"
+                                                                >
+                                                                    {
+                                                                        level?.description
+                                                                    }
+                                                                </td>
+                                                            )
+                                                        )}
+                                                    </tr>
+                                                );
+                                            })}
+                                    </tbody>
+                                </table>
                             </p>
                         </div>
+                    </div>
+                )}
+
+                {analysisResult && (
+                    <div className="mt-6">
+                        <h2 className="text-xl font-semibold text-gray-800 mb-4">
+                            Raw Response
+                        </h2>
+                        <pre className="bg-gray-100 p-4 rounded-lg text-sm text-gray-700 overflow-auto">
+                            {JSON.stringify(analysisResult.analysis, null, 2)}
+                        </pre>
                     </div>
                 )}
             </main>
